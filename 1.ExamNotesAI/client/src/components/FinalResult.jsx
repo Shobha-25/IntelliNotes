@@ -5,13 +5,31 @@ import RechartSetUp from "./RechartSetUp";
 
 function parseResult(result) {
   if (!result) return null;
-  if (typeof result === "object") return result;
+  let data = result;
 
-  try {
-    return JSON.parse(result);
-  } catch {
-    return null;
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return null;
+    }
   }
+
+  if (typeof data?.notes === "string") {
+    try {
+      const nestedNotes = JSON.parse(data.notes);
+      if (nestedNotes?.notes && nestedNotes?.subTopics && nestedNotes?.questions) {
+        data = {
+          ...data,
+          ...nestedNotes,
+        };
+      }
+    } catch {
+      // Markdown notes are already usable as-is.
+    }
+  }
+
+  return data;
 }
 
 function downloadPdf() {
@@ -91,7 +109,7 @@ function FinalResult({ result }) {
 
         <SectionHeader icon="⭐" title="Sub Topics" color="indigo" />
       {
-         Object.entries(result.subTopics).map(([star, topics]) => (
+         Object.entries(data.subTopics).map(([star, topics]) => (
             <div key={star} className='mb-3
         '>
 
@@ -99,7 +117,7 @@ function FinalResult({ result }) {
             {star} Priority
         </p>
         <ul className='list-disc ml-6 text-gray-700'>
-            {topics.map((t, i) => (
+            {(Array.isArray(topics) ? topics : []).map((t, i) => (
                 <li key={i}>{t}</li>
                                 ))}
                             </ul>
@@ -135,17 +153,17 @@ function FinalResult({ result }) {
                         ⚡ Exam Quick Revision Points
                     </h3>
                     <ul className='list-disc ml-6 space-y-1 text-gray-800'>
-                        {result.revisionPoints.map((p, i) => (
+                        {data.revisionPoints.map((p, i) => (
                             <li key={i}>{p}</li>
                         ))}
                     </ul>
       </section> }
 
 
-      {result.diagram?.data && <section>
+      {data.diagram?.data && <section>
                 <SectionHeader icon="📊" title="Diagram" color="cyan" />
 
-                <MermaidSetup diagram={result.diagram?.data} />
+                <MermaidSetup diagram={data.diagram?.data} />
                 <p className="mt-3 text-xs text-gray-500 italic">
                     ℹ️ If you need this diagram for future reference or revision,
                     you can save it by taking a screenshot.
@@ -153,10 +171,10 @@ function FinalResult({ result }) {
 
             </section>}
 
-            {result.charts?.length > 0 &&
+            {data.charts?.length > 0 &&
                 <section>
                     <SectionHeader icon="📈" title="Visual Charts" color="indigo" />
-                    <RechartSetUp charts={result.charts} />
+                    <RechartSetUp charts={data.charts} />
                     <p className="mt-3 text-xs text-gray-500 italic">
                         ℹ️ If you need this Chart for future reference or revision,
                         you can save it by taking a screenshot.
@@ -164,7 +182,7 @@ function FinalResult({ result }) {
 
                 </section>}
 
-            {result.charts && result.charts.length === 0 && (
+            {data.charts && data.charts.length === 0 && (
                 <p className="text-sm text-gray-400 italic">
                     📉 Charts are not relevant for this topic.
                 </p>
@@ -178,21 +196,21 @@ function FinalResult({ result }) {
 
                 <p className='font-medium'>Short Questions:</p>
                 <ul className='list-disc ml-6 text-gray-700'>
-                    {result.questions.short.map((q, i) => (
+                    {data.questions.short.map((q, i) => (
                         <li key={i}>{q}</li>
                     ))}
                 </ul>
 
                 <p className='font-medium mt-4'>Long Questions:</p>
                 <ul className='list-disc ml-6 text-gray-700'>
-                    {result.questions.long.map((q, i) => (
+                    {data.questions.long.map((q, i) => (
                         <li key={i}>{q}</li>
                     ))}
 
                 </ul>
                 <p className='font-medium mt-4'>Diagram Question:</p>
                 <ul className='list-disc ml-6 text-gray-700'>
-                    <li>{result.questions.diagram}</li>
+                    <li>{data.questions.diagram}</li>
                 </ul>
       </section>
 
