@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import MermaidSetup from "./MermaidSetup";
 import RechartSetUp from "./RechartSetUp";
+import { downloadPdf as downloadPdfFile } from "../services/api";
 
 function parseResult(result) {
   if (!result) return null;
@@ -30,10 +31,6 @@ function parseResult(result) {
   }
 
   return data;
-}
-
-function downloadPdf() {
-  window.print();
 }
 
 const markDownComponent = {
@@ -65,6 +62,8 @@ const markDownComponent = {
 
 function FinalResult({ result }) {
   const [quickRevision, setQuickRevision] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState("");
   const data = parseResult(result);
 
   if (
@@ -97,13 +96,29 @@ function FinalResult({ result }) {
             {quickRevision ? "Exit Revision Mode" : "Quick Revision (5 min)"}
           </button>
 
-          <button onClick={()=>downloadPdf(result)}
+          <button
+            onClick={async () => {
+              setPdfError("");
+              setPdfLoading(true);
+
+              try {
+                await downloadPdfFile(data);
+              } catch (error) {
+                console.error(error);
+                setPdfError("PDF download failed. Please try again.");
+              } finally {
+                setPdfLoading(false);
+              }
+            }}
+            disabled={pdfLoading}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
-            Download PDF
+            {pdfLoading ? "Preparing PDF..." : "Download PDF"}
           </button>
         </div>
       </div>
+
+      {pdfError && <p className="text-sm text-red-600">{pdfError}</p>}
 
     {!quickRevision && <section>
 
