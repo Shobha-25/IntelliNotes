@@ -39,7 +39,13 @@ export const createOrder = async (req,res) => {
 
     
     } catch (error) {
-         return res.status(500).json({message:`failed to create Razorpay order ${error}`})
+         const description = error?.error?.description || error?.message || "Unable to create payment order";
+         const statusCode = error?.statusCode === 401 ? 401 : 500;
+
+         return res.status(statusCode).json({
+          message: "Failed to create Razorpay order",
+          error: description,
+         })
     }
 }
 
