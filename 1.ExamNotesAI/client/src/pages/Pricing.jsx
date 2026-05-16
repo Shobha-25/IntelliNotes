@@ -28,6 +28,25 @@ function Pricing() {
         { withCredentials: true }
       )
 
+      if (result.data.mock) {
+        const verifyResult = await axios.post(
+          serverUrl + "/api/payment/verify",
+          {
+            razorpay_order_id: result.data.id,
+            razorpay_payment_id: `pay_mock_${Date.now()}`,
+            razorpay_signature: "local_mock_signature",
+          },
+          { withCredentials: true }
+        )
+
+        if (typeof verifyResult.data?.user?.credits === "number") {
+          dispatch(updateCredits(verifyResult.data.user.credits))
+        }
+
+        navigate("/")
+        return
+      }
+
       if (!window.Razorpay) {
         throw new Error("Razorpay checkout script is not loaded")
       }
