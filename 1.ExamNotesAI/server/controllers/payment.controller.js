@@ -4,7 +4,7 @@ import razorpay from "../services/razorpay.services.js";
 import crypto from "crypto"
 
 const isLocalPaymentFallbackAllowed = () => {
-  return process.env.CLIENT_URL?.includes("localhost");
+  return process.env.ENABLE_LOCAL_PAYMENT_FALLBACK === "true" && process.env.CLIENT_URL?.includes("localhost");
 };
 
 const isMockOrderId = (orderId) => {

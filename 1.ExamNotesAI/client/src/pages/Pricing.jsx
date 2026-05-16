@@ -13,11 +13,13 @@ function Pricing() {
   const [selectedPrice, setSelectedPrice] = useState(null)
   const [paying, setPaying] = useState(false)
   const [payingAmount, setPayingAmount] = useState(null)
+  const [paymentError, setPaymentError] = useState("")
 
   const handlePaying = async (plan) => {
     try {
       setPayingAmount(plan.amount)
       setPaying(true)
+      setPaymentError("")
       const result = await axios.post(
         serverUrl + "/api/payment/order",
         {
@@ -87,6 +89,7 @@ function Pricing() {
       rzp.open()
     } catch (error) {
       console.log(error)
+      setPaymentError(error?.response?.data?.error || error?.response?.data?.message || error.message || "Payment failed")
       setPaying(false)
     }
   }
@@ -117,6 +120,12 @@ function Pricing() {
             Choose a plan that fits your study needs
           </p>
         </motion.div>
+
+        {paymentError && (
+          <div className="mx-auto mb-6 max-w-3xl rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700">
+            {paymentError}
+          </div>
+        )}
 
         <div className='mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3'>
           <PricingCard
