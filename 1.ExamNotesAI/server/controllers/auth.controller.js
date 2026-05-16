@@ -2,6 +2,8 @@ import UserModel from "../models/user.model.js"
 import { getToken } from "../utils/token.js"
 import { applyCreditGrant } from "../utils/credits.js"
 
+const isProduction = process.env.NODE_ENV === "production";
+
 
 export const googleAuth = async (req,res) => {
     try {
@@ -19,8 +21,8 @@ export const googleAuth = async (req,res) => {
         console.log("TOKEN IS:", token)
         res.cookie("token" , token , {
             httpOnly:true,
-            secure:true,
-            sameSite:"none",
+            secure:isProduction,
+            sameSite:isProduction ? "none" : "lax",
             maxAge:7 * 24 * 60 * 60 * 1000
 
         })
@@ -35,8 +37,8 @@ export const logOut = async (req,res) => {
     try {
         res.clearCookie("token", {
             httpOnly:true,
-            secure:false,
-            sameSite:"lax",
+            secure:isProduction,
+            sameSite:isProduction ? "none" : "lax",
         })
         return res.status(200).json({message:"User logged out successfully"})
     } catch (error) {

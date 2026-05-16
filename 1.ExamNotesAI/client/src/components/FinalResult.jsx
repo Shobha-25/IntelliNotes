@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import MermaidSetup from "./MermaidSetup";
+import RechartSetUp from "./RechartSetUp";
 
 function parseResult(result) {
   if (!result) return null;

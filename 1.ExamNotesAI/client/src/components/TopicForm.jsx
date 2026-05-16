@@ -39,6 +39,10 @@ function TopicForm({ setResult, setLoading, loading, setError, error }) {
         includeChart
       })
 
+      if (!result?.data) {
+        throw new Error("No notes were returned from the server")
+      }
+
       setResult(result.data)
       setClassLevel("")
       setTopic("")
