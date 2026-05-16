@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
    status: {
     type: String,
     enum: ["created", "paid", "failed"],
-    default: "paid"
+    default: "created"
    },
 },{timestamps: true})
 

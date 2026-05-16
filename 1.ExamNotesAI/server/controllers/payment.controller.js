@@ -8,8 +8,9 @@ export const createOrder = async (req,res) => {
         const {planId, amount, credits} = req.body;
 
     const paidPlans = {
-      basic: { amount: 100, credits: 150 },
-      pro: { amount: 500, credits: 650 },
+      starter: { amount: 100, credits: 100 },
+      popular: { amount: 200, credits: 250 },
+      pro: { amount: 500, credits: 700 },
     };
 
     const selectedPlan = paidPlans[planId];

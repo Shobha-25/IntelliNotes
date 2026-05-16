@@ -14,11 +14,19 @@ function Pricing() {
   const [paying, setPaying] = useState(false)
   const [payingAmount, setPayingAmount] = useState(null)
 
-  const handlePaying = async (amount) => {
+  const handlePaying = async (plan) => {
     try {
-      setPayingAmount(amount)
+      setPayingAmount(plan.amount)
       setPaying(true)
-      const result = await axios.post(serverUrl + "/api/credit/order", { amount }, { withCredentials: true })
+      const result = await axios.post(
+        serverUrl + "/api/payment/order",
+        {
+          planId: plan.id,
+          amount: plan.amount,
+          credits: plan.credits,
+        },
+        { withCredentials: true }
+      )
 
       if (!window.Razorpay) {
         throw new Error("Razorpay checkout script is not loaded")
@@ -29,13 +37,12 @@ function Pricing() {
         amount: result.data.amount,
         currency: result.data.currency,
         name: "IntelliNotes",
-        description: `${result.data.credits} credits`,
-        order_id: result.data.orderId,
+        description: `${plan.credits} credits`,
+        order_id: result.data.id,
         handler: async (response) => {
           const verifyResult = await axios.post(
-            serverUrl + "/api/credit/verify",
+            serverUrl + "/api/payment/verify",
             {
-              amount,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -43,8 +50,8 @@ function Pricing() {
             { withCredentials: true }
           )
 
-          if (typeof verifyResult.data?.credits === "number") {
-            dispatch(updateCredits(verifyResult.data.credits))
+          if (typeof verifyResult.data?.user?.credits === "number") {
+            dispatch(updateCredits(verifyResult.data.user.credits))
           }
 
           navigate("/")
@@ -97,7 +104,8 @@ function Pricing() {
             title="Starter"
             price="Rs. 100"
             amount={100}
-            credits="100 Credits"
+            credits={100}
+            planId="starter"
             description="Perfect for quick revisions"
             features={[
               "Generate AI notes",
@@ -117,7 +125,8 @@ function Pricing() {
             title="Popular"
             price="Rs. 200"
             amount={200}
-            credits="250 Credits"
+            credits={250}
+            planId="popular"
             description="Best value for students"
             features={[
               "All Starter features",
@@ -136,7 +145,8 @@ function Pricing() {
             title="Pro Learner"
             price="Rs. 500"
             amount={500}
-            credits="700 Credits"
+            credits={700}
+            planId="pro"
             description="For serious exam preparation"
             features={[
               "Maximum credit value",
@@ -161,6 +171,7 @@ function PricingCard({
   price,
   amount,
   credits,
+  planId,
   description,
   features,
   popular,
@@ -205,14 +216,14 @@ function PricingCard({
 
         <div className='mt-5'>
           <p className="theme-brand text-4xl font-black">{price}</p>
-          <p className="mt-1 text-sm font-semibold text-teal-700">{credits}</p>
+          <p className="mt-1 text-sm font-semibold text-teal-700">{credits} Credits</p>
         </div>
 
         <button
           disabled={isPayingThisCard}
           onClick={(e) => {
             e.stopPropagation()
-            onBuy(amount)
+            onBuy({ id: planId, amount, credits })
           }}
           className={`mt-6 w-full rounded-xl py-3 font-semibold transition ${
             isPayingThisCard
