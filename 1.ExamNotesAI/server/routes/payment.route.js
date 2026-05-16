@@ -1,5 +1,5 @@
 import express from "express"
-import isAuth from "../middlewares/isAuth.js"
+import isAuth from "../middleware/isAuth.js"
 import { createOrder, verifyPayment } from "../controllers/payment.controller.js"
 
 
