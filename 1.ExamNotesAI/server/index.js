@@ -16,7 +16,7 @@ dotenv.config()
 const app = express()
 
 app.use(cors(
-  {origin:["http://localhost:5173","http://localhost:5174","https://intellinotes-lsjw.onrender.com"],
+  {origin:["https://intellinotes-lsjw.onrender.com"],
     credentials:true,
     methods:["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   }
