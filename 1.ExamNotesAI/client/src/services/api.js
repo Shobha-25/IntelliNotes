@@ -1,8 +1,6 @@
 import axios from "axios"
-//import { serverUrl} from "../App"// // written THIS FOR JUST TO AVOID BlanK auth PAge 
+import { serverUrl } from "../config/api"
 import { setUserData } from "../redux/userSlice"
-
-const serverUrl = "http://localhost:8000"
 
 export const getCurrentUser = async (dispatch) => {
   try {

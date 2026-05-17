@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from "motion/react"
 import axios from 'axios'
-import { serverUrl } from '../App'
+import { serverUrl } from '../config/api'
 import ThemeToggle from '../components/ThemeToggle'
 import { useDispatch } from 'react-redux'
 import { updateCredits } from '../redux/userSlice'

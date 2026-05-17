@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { serverUrl } from '../App'
+import { serverUrl } from '../config/api'
 import { AnimatePresence, motion } from "motion/react"
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
