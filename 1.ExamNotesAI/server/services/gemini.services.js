@@ -41,6 +41,9 @@ try {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          generationConfig: {
+            responseMimeType: "application/json"
+          },
           contents: [
             {
               parts: [

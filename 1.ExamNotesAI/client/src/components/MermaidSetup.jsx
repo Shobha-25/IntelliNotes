@@ -11,35 +11,28 @@ const cleanMermaidChart = (diagram) => {
   if (!diagram) return "";
 
   let clean = diagram
+    .replace(/```mermaid/gi, "")
+    .replace(/```/g, "")
     .replace(/\r\n/g, "\n")
     .trim();
 
-  if (!clean.startsWith("graph")) {
+  if (!/^(graph|flowchart)\s+/i.test(clean)) {
     clean = `graph TD\n${clean}`;
   }
 
   return clean;
 };
 
-const autoFixNodes = (diagram) => {
-  let index = 0;
-  const used = new Map();
+const sanitizeLabels = (diagram) => {
+  return diagram.replace(/\[([^\]]*)\]/g, (_, label) => {
+    const safeLabel = label
+      .replace(/^["']|["']$/g, "")
+      .replace(/["`]/g, "")
+      .replace(/[{}<>|]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
-  return diagram.replace(/\[(.*?)\]/g, (match, label) => {
-    // normalize label for key
-    const key = label.trim();
-
-    // reuse same node if label already seen
-    if (used.has(key)) {
-      return used.get(key);
-    }
-
-    index++;
-    const id = `N${index}`;
-    const node = `${id}["${key}"]`;
-
-    used.set(key, node);
-    return node;
+    return `["${safeLabel}"]`;
   });
 };
 
@@ -59,14 +52,15 @@ useEffect(() => {
           .toString(36)
           .substring(2, 9)}`;
 
-        // ✅ sanitize before render
-        const safeChart = autoFixNodes(cleanMermaidChart(diagram));
+        const safeChart = sanitizeLabels(cleanMermaidChart(diagram));
 
         const { svg } = await mermaid.render(uniqueId, safeChart);
 
         containerRef.current.innerHTML = svg;
       } catch (error) {
         console.error("Mermaid render failed:", error);
+        containerRef.current.innerHTML =
+          '<p class="text-sm text-red-600">Unable to render this diagram. Please regenerate the notes.</p>';
       }
     };
 
