@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
 function RechartSetUp({ charts }) {
     if (!charts || charts.length === 0) return null;
