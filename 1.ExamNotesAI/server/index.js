@@ -22,12 +22,26 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
 ].filter(Boolean)
 
-app.use(cors(
-  {origin: allowedOrigins,
-    credentials:true,
-    methods:["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith(".onrender.com");
+  } catch {
+    return false;
   }
-))
+};
+
+app.use(cors({
+  origin: (origin, callback) => {
+    callback(null, isAllowedOrigin(origin) ? origin : false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}))
 app.use(express.json())
 app.use(cookieParser())
 
